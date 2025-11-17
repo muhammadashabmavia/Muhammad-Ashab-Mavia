@@ -1,71 +1,53 @@
-document.addEventListener("DOMContentLoaded", function () {
-
-    // Mobile menu toggle
-    const mobileMenu = document.querySelector('.mobile-menu');
-    if (mobileMenu) {
-        mobileMenu.addEventListener('click', function() {
-            document.querySelector('.nav-links').classList.toggle('active');
+    // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
         });
-    }
 
-    // Smooth scrolling
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-
-            const targetId = this.getAttribute('href');
-            if (targetId === '#') return;
-
-            const targetElement = document.querySelector(targetId);
-            if (targetElement) {
-                window.scrollTo({
-                    top: targetElement.offsetTop - 80,
-                    behavior: 'smooth'
-                });
-                document.querySelector('.nav-links').classList.remove('active');
-            }
-        });
-    });
-
-    // Slider
-    const sliderContainer = document.querySelector('.projects-container');
-    const slides = document.querySelectorAll('.project-card');
-    const dots = document.querySelectorAll('.slider-dot');
-    const prevBtn = document.querySelector('.slider-arrow.prev');
-    const nextBtn = document.querySelector('.slider-arrow.next');
-
-    if (sliderContainer && slides.length > 0) {
-
-        let currentSlide = 0;
-        const slideCount = slides.length;
-
-        function updateSlider() {
-            sliderContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
-            dots.forEach((dot, index) => {
-                dot.classList.toggle('active', index === currentSlide);
+        // Mobile menu toggle
+        const mobileMenu = document.querySelector('.mobile-menu');
+        const navLinks = document.querySelector('.nav-links');
+        
+        if (mobileMenu) {
+            mobileMenu.addEventListener('click', () => {
+                navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
             });
         }
 
-        nextBtn?.addEventListener('click', () => {
-            currentSlide = (currentSlide + 1) % slideCount;
-            updateSlider();
-        });
+        // Form submission handler
+        const contactForm = document.querySelector('form[name="contact"]');
+        if (contactForm) {
+            contactForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Thank you for your message! I will get back to you soon.');
+                this.reset();
+            });
+        }
 
-        prevBtn?.addEventListener('click', () => {
-            currentSlide = (currentSlide - 1 + slideCount) % slideCount;
-            updateSlider();
-        });
+        // Active navigation highlighting
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section[id]');
+            const scrollY = window.pageYOffset;
 
-        dots.forEach((dot, index) => {
-            dot.addEventListener('click', () => {
-                currentSlide = index;
-                updateSlider();
+            sections.forEach(section => {
+                const sectionHeight = section.offsetHeight;
+                const sectionTop = section.offsetTop - 100;
+                const sectionId = section.getAttribute('id');
+                const navLink = document.querySelector(`.nav-links a[href="#${sectionId}"]`);
+
+                if (navLink && scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+                    document.querySelectorAll('.nav-links a').forEach(link => {
+                        link.style.color = '';
+                    });
+                    navLink.style.color = 'var(--primary-color)';
+                }
             });
         });
-
-        setInterval(() => {
-            currentSlide = (currentSlide + 1) % slideCount;
-            updateSlider();
-        }, 5000);
-    }
-});
